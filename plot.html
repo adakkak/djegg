@@ -3,56 +3,77 @@
  <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>EEG Plot</title>
-    <link href="layout.css" rel="stylesheet" type="text/css"></link>
     <!--[if IE]><script language="javascript" type="text/javascript" src="media/js/excanvas.pack.js"></script><![endif]-->
     <script language="javascript" type="text/javascript" src="media/js/jquery.js"></script>
     <script language="javascript" type="text/javascript" src="media/js/flot/jquery.flot.js"></script>
+
+      <link rel="stylesheet" href="http://dev.jquery.com/view/tags/ui/latest/themes/flora/flora.all.css" type="text/css" media="screen" title="Flora (Default)">
+    <script type="text/javascript" src="http://dev.jquery.com/view/tags/ui/latest/ui/ui.core.js"></script>
+    <script type="text/javascript" src="http://dev.jquery.com/view/tags/ui/latest/ui/ui.slider.js"></script>
+
+
  </head>
     <body>
     <h1>EEG Plot</h1>
 
     <div style="float:left">
-        <div id="placeholder" style="width:1000px;height:400px;"></div>
+        <div id="plot" style="width:1000px;height:400px;"></div>
+    <div id='example' class='ui-slider-1' style="margin:10px;">
+    <div class='ui-slider-handle'></div>
     </div>
 
     <div id="miniature" style="float:right;margin-right:20px;margin-top:-120px">
       <div id="overview" style="width:166px;height:100px"></div>
-
-      <p id="overviewLegend" style="margin-left:10px"></p>
+      <p id="overviewLegend" style="margin-right:40px;margin-left:10px"></p>
     </div>
 
+    <h1>Header</h1>
+    <ul id="header"></ul>
 
 <script id="source" language="javascript" type="text/javascript">
 $(function () {
-    function getData(data, x1, x2) {
-        var d = [];
-        for(var i = 0; i < data.length; i++) {
-            d.push([]);
+
+    function getData(r, x1, x2) {
+        var d = new Array();
+        for(var i = 0; i < r.length; i++) {
+            d[i] = new Object();
+            d[i].label = r[i].label;
+            d[i].data = new Array();
         }
-        for(var i = 0; i < data.length; i++) {
+        for(var i = 0; i < r.length; i++) {
             for (var j = x1; j < x2; j++)
-                d[i][j] = data[i][j];
+                d[i].data[j] = r[i].data[j];
         }
 
-        return d
+        return d;
     };
 
-    $.get("http://localhost:8000/plot/",
-        function(data){
+    var num_of_samples = 1000;
+
+<!--    $("#example").slider();-->
+
+    $.getJSON("http://localhost:8000/plot/"+num_of_samples,
+        function(response){
           var options = {
-            legend: {show: false},
+            legend: {show: true},
             points: {show: true},
             lines: {show: true},
             yaxis: {ticks: 10},
             selection: {mode: "x"}
           };
-          data = eval(data);
 
-          $.plot($("#placeholder"), data, options);
+          var data = response.samples;
+
+          $.plot($("#plot"), data, options);
+
+          $.each(response.header, function(i, item) {
+              $("#header").append("<li><b>" + i + "</b>:" + item + "</li>");
+          });
 
           var overview = $.plot($("#overview"), data, {
               lines: { show: true, lineWidth: 1 },
               shadowSize: 0,
+              legend: {show: false},
               xaxis: { ticks: 4 },
               yaxis: { ticks: 3, min: -2, max: 2 },
               grid: { color: "#999" },
@@ -61,11 +82,11 @@ $(function () {
 
           // now connect the two
           
-          $("#placeholder").bind("plotselected", function (event, ranges) {
+          $("#plot").bind("plotselected", function (event, ranges) {
               // make sure the indecies are integers
               ranges.xaxis.from = parseInt(ranges.xaxis.from);
               ranges.xaxis.to = parseInt(ranges.xaxis.to);
-              plot = $.plot($("#placeholder"), getData(data, ranges.xaxis.from, ranges.xaxis.to),
+              plot = $.plot($("#plot"), getData(data, ranges.xaxis.from, ranges.xaxis.to),
                           $.extend(true, {}, options, {
                               xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to-1 }
                           }));

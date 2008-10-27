@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     # (r'^djegg/', include('djegg.foo.urls')),
 
     (r'^time/$', current_datetime),
-    (r'^plot/$', plot),
+    (r'^plot/(\d*)$', plot),
     (r'^static/(?P<path>.*)', 'django.views.static.serve', {'document_root': ''}),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
