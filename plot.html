@@ -1,37 +1,61 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
- <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>EEG Plot</title>
-    <!--[if IE]><script language="javascript" type="text/javascript" src="media/js/excanvas.pack.js"></script><![endif]-->
-    <script language="javascript" type="text/javascript" src="media/js/jquery.js"></script>
-    <script language="javascript" type="text/javascript" src="media/js/flot/jquery.flot.js"></script>
+<head>
+<meta name="generator" content=
+"HTML Tidy for Linux/x86 (vers 19 September 2007), see www.w3.org">
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii">
+<title>EEG Plot</title>
+<!--[if IE]><script language="javascript" type="text/javascript" src="media/js/excanvas.pack.js"></script><![endif]-->
 
-      <link rel="stylesheet" href="http://dev.jquery.com/view/tags/ui/latest/themes/flora/flora.all.css" type="text/css" media="screen" title="Flora (Default)">
-    <script type="text/javascript" src="http://dev.jquery.com/view/tags/ui/latest/ui/ui.core.js"></script>
-    <script type="text/javascript" src="http://dev.jquery.com/view/tags/ui/latest/ui/ui.slider.js"></script>
+<script language="javascript" type="text/javascript" src=
+"media/js/jquery.js">
+</script>
+<script language="javascript" type="text/javascript" src="media/js/jquery.sparkline.js">
+</script>
+<script language="javascript" type="text/javascript" src="media/js/flot/jquery.flot.js">
+</script>
+<script language="javascript" type="text/javascript" src="media/js/ui.core.js">
+</script>
+<script language="javascript" type="text/javascript" src="media/js/ui.dialog.js">
+</script>
+<script language="javascript" type="text/javascript" src="media/js/ui.resizable.js">
+</script>
+<script language="javascript" type="text/javascript" src="media/js/ui.draggable.js">
+</script>
+<link rel="stylesheet" href=
+"http://dev.jquery.com/view/tags/ui/latest/themes/flora/flora.all.css"
+type="text/css" media="screen" title="Flora (Default)">
 
+<link rel="stylesheet" type="text/css" href="media/css/style.css" media="screen" />
+<!--[if IE]><link rel="stylesheet" type="text/css" href="media/css/ie.css" /><![endif]-->
 
- </head>
-    <body>
-    <h1>EEG Plot</h1>
+</head>
+<body>
 
-    <div style="float:left">
-        <div id="plot" style="width:1000px;height:400px;"></div>
-    <div id='example' class='ui-slider-1' style="margin:10px;">
-    <div class='ui-slider-handle'></div>
-    </div>
-
-    <div id="miniature" style="float:right;margin-right:20px;margin-top:-120px">
-      <div id="overview" style="width:166px;height:100px"></div>
-      <p id="overviewLegend" style="margin-right:40px;margin-left:10px"></p>
-    </div>
-
-    <h1>Header</h1>
-    <ul id="header"></ul>
+<div id="wrapper">
+   <div class="generic nineforty" style="background-color: #555; color:white;">
+       <h1 class="header_title" style="text-align:center;color:white;">Toledo EEG</h1>
+       <ul id="eeg_header" style="background-color:white;color:black;"></ul>
+   </div>
+   <div class="generic nineforty">
+<!--       <h2>Plot</h2>-->
+       <div id="plot" style="height:400px;"></div>
+       <div id="miniature" style=
+       "float:right;margin-right:20px;margin-top:-120px">
+       <div id="overview" style="width:166px;height:100px"></div>
+       <p id="overviewLegend" style="margin-right:40px;margin-left:10px"/>
+   </div>
+   <div class="generic nineforty">
+       <div class="sparkline"/>
+   </div>
+</div>
+<div id="ft">Toledo EEG. Powered by Django</div>
 
 <script id="source" language="javascript" type="text/javascript">
 $(function () {
+    var num_of_samples = 200;
 
     function getData(r, x1, x2) {
         var d = new Array();
@@ -48,9 +72,20 @@ $(function () {
         return d;
     };
 
-    var num_of_samples = 1000;
+    $("#eeg_header").hide();
 
-<!--    $("#example").slider();-->
+    $(".header_title").click(function() {
+        $("#eeg_header").slideToggle("slow");
+    });
+
+<!--    $(".header_title").mouseover(function() {-->
+<!--        $("#eeg_header").slideToggle("slow");-->
+<!--    });-->
+
+<!--    $(".header_title").mouseout(function() {-->
+<!--        $("#eeg_header").slideToggle("slow");-->
+<!--    });-->
+
 
     $.getJSON("http://localhost:8000/plot/"+num_of_samples,
         function(response){
@@ -67,7 +102,7 @@ $(function () {
           $.plot($("#plot"), data, options);
 
           $.each(response.header, function(i, item) {
-              $("#header").append("<li><b>" + i + "</b>:" + item + "</li>");
+              $("#eeg_header").append("<li><b>" + i + "<\/b>: " + item + "<\/li>");
           });
 
           var overview = $.plot($("#overview"), data, {
@@ -97,9 +132,46 @@ $(function () {
           $("#overview").bind("plotselected", function (event, ranges) {
               plot.setSelection(ranges);
           });
+
+          $.each(data, function(index, sample) {
+            $(".legendLabel:contains('" + this.label[0] + "')").click(function() {
+                var a = new Array();
+                for(i = 0; i < sample.data.length; i++)
+                    a[i] = sample.data[i][1];
+                var clean_name = sample.label[0].split(" ").join("").split("+").join("");
+                $(".sparkline").append(
+                    "<div class='dialog" + clean_name + "'>" + 
+                        "<h3>" + sample.label + "<\/h3>" +
+                        "<div class='sparkline_plot" +  clean_name + "'> Loading...<\/div>" +
+                        "<\/div><br/>"
+                );
+                $(".sparkline_plot" + clean_name).sparkline(a);
+                $(".dialog" + clean_name).dialog({
+                    modal: true,
+                    overlay: {
+                        opacity: 0.75,
+                        background: "white"
+                    },
+                    resizable: false,
+                    width: ($("." + clean_name).width()),
+                    height: $("." + clean_name).height()
+                });
+            });
+          });
     });
 });
 </script>
-
- </body>
+</body>
 </html>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+ "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+   <title>YUI Base Page</title>
+</head>
+<body>
+</body>
+</html>
+
+
