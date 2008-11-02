@@ -14,9 +14,13 @@ class EDF:
         self.samples = [[] for i in xrange(self.ns)]
 
         self.read_samples()
+        self.n = 0
 
     def next_sample(self):
-        return self.read_samples().next()
+#        return self.read_samples().next()
+        next_sample = map(lambda x: 0 if self.n > len(x) else x[self.n], self.samples)
+        self.n += 1
+        return next_sample 
 
     def to_int(self, *args):
         return map(lambda x: int(x), *args)
@@ -41,7 +45,7 @@ class EDF:
         self.ns = self.header["num_of_signals"] = int(self.file.read(4))
 
         self.header["labels"] = [self.file.read(16).strip() for i in xrange(self.ns)]
-        self.header["traself.nsducer_types"] = [self.file.read(80).strip() for i in xrange(self.ns)]
+        self.header["transducer_types"] = [self.file.read(80).strip() for i in xrange(self.ns)]
         self.header["physical_dims"] = [self.file.read(8).strip() for i in xrange(self.ns)]
         self.header["physical_mins"] = self.to_int([self.file.read(8) for i in xrange(self.ns)])
         self.header["physical_maxs"] = self.to_int([self.file.read(8) for i in xrange(self.ns)])
@@ -53,10 +57,12 @@ class EDF:
 
     def read_samples(self):
         for i in xrange(self.ns): 
+#            samples = []
             for j in xrange(self.header["nrs"][i]): 
                 sample = self.twos_complement(self.file.read(2))
                 self.samples[i].append(sample)
-#                yield sample
+#                samples.append(sample)
+#            yield samples
 
 #file_name = "test_data/st7132j0.rec"
 #edf =  EDF(file_name)

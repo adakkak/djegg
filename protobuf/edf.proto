@@ -1,0 +1,35 @@
+package edf;
+
+message Header {
+    required string version = 1;
+    required string patient_id = 2;
+    required string record_id = 3;
+    required string startdate = 4;
+    required string starttime = 5;
+    required string header_length = 6;
+
+    required int32 num_of_records = 7;
+    required int32 record_duration = 8;
+    required int32 num_of_signals = 9;
+    required int32 labels = 10;
+}
+
+message Error {
+    required sint32 code = 1;
+    optional string text = 2;
+}
+
+message Request {
+    required string method = 1;
+    optional bytes serialized_request = 2;
+}
+
+message Response {
+    optional bytes serialized_response = 1;
+    optional Error error = 2;
+}
+
+service HeaderService {
+    rpc GetHeader (Request) returns (Response);
+}
+
