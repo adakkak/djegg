@@ -18,7 +18,7 @@ class EDF:
 
     def next_sample(self):
 #        return self.read_samples().next()
-        next_sample = map(lambda x: 0 if self.n > len(x) else x[self.n], self.samples)
+        next_sample = map(lambda x: 0 if self.n >= len(x) else x[self.n], self.samples)
         self.n += 1
         return next_sample 
 

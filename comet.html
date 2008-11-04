@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<title>Comet EEG</title>
+<script src="http://localhost:9000/static/Orbited.js"></script>
+<script>
+TCPSocket = Orbited.TCPSocket;
+</script>
+<!--[if IE]><script language="javascript" type="text/javascript" src="media/js/excanvas.pack.js"></script><![endif]-->
+
+<script src="http://localhost:9000/static/protocols/stomp/stomp.js"></script>
+<script language="javascript" type="text/javascript" src="media/js/jquery.js">
+</script>
+<script language="javascript" type="text/javascript" src="media/js/jquery.sparkline.js">
+</script>
+<script language="javascript" type="text/javascript" src="media/js/flot/jquery.flot.js">
+</script>
+<style>
+    body, html, h1 {
+        font-family: sans-serif;
+        background-color: #f3ffe2;
+        text-align: center;
+    }
+    h1, h2 {
+        margin: 0px;
+    }
+    .bar {
+        background-color: #38f;
+        height: 12px;
+        width: 200px;
+        margin: 3px 0px;
+    }
+    #container {
+        margin: auto;
+        border: 2px solid #000;
+        width: 400px;
+        background-color: #fff;
+    }
+</style>
+<script>
+    
+    
+    // Change the length of the bars to match given numerical data
+    var update_graph = function(datagram, data, body) {
+        var vals = JSON.parse(body);
+
+        if(data[0] == null) {
+            for(var i = 0; i < vals.length; i++) {
+                data[i] = [];
+            }
+        }
+
+        for(var i = 0; i < vals.length; i++) {
+            data[i].push([datagram,vals[i]]);
+        }
+
+        while(data.length > 10) {
+            for(var i = 0; i < data[0].length; i++) {
+                data[i].shift();
+            }
+        }
+
+        var options = {
+            points: {
+                show: true,
+                radius: 3
+            },
+            lines: {
+                show: true
+            }
+        }
+        $.plot($("#plot"), data, options);
+    }
+
+    // In production use your js toolkit's onload system, or event listeners
+    onload = function() {
+        var data = [];
+        var datagram = 0;
+        stomp = new STOMPClient();
+        stomp.onopen = function() {
+        };
+        stomp.onclose = function(c) { alert('Lost Connection, Code: ' + c);};
+        stomp.onerror = function(error) {
+            alert("Error: " + error);
+        };
+        stomp.onerrorframe = function(frame) {
+            alert("Error: " + frame.body);
+        };
+        stomp.onconnectedframe = function() {
+            stomp.subscribe("/comet/plot");
+        };
+        stomp.onmessageframe = function(frame) {
+            update_graph(datagram, data, frame.body);
+            datagram++;
+        };
+        stomp.connect('localhost', 61613);
+    }
+</script>
+
+<h1>EEG Real-Time Graph</h1>
+<div id="plot" style="height:400px;"></div>
+
