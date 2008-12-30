@@ -13,7 +13,7 @@ class CometFactory(StompClientFactory):
         print 'Connected; producing data'
         self.edf = EDF("test_data/st7132j0.rec")
         self.timer = LoopingCall(self.send_data)
-        self.timer.start(0.2)
+        self.timer.start(0.5)
 
     def recv_message(self,msg):
         pass

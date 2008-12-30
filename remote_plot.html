@@ -24,9 +24,9 @@
 </script>
 <script language="javascript" type="text/javascript" src="media/js/ui.draggable.js">
 </script>
-<link rel="stylesheet" href=
-"http://dev.jquery.com/view/tags/ui/latest/themes/flora/flora.all.css"
-type="text/css" media="screen" title="Flora (Default)">
+<!--<link rel="stylesheet" href=-->
+<!--"http://dev.jquery.com/view/tags/ui/latest/themes/flora/flora.all.css"-->
+<!--type="text/css" media="screen" title="Flora (Default)">-->
 
 <link rel="stylesheet" type="text/css" href="media/css/style.css" media="screen" />
 <!--[if IE]><link rel="stylesheet" type="text/css" href="media/css/ie.css" /><![endif]-->
@@ -55,7 +55,7 @@ type="text/css" media="screen" title="Flora (Default)">
 
 <script id="source" language="javascript" type="text/javascript">
 $(function () {
-    var num_of_samples = 1000;
+    var num_of_samples = 200;
 
     function getData(r, x1, x2) {
         var d = new Array();
@@ -87,7 +87,7 @@ $(function () {
 <!--    });-->
 
 
-    $.getJSON("http://192.168.1.104:8000/remote_plot/"+num_of_samples,
+    $.getJSON("http://localhost:8000/remote_plot/"+num_of_samples,
         function(response){
           var options = {
             legend: {show: true},
