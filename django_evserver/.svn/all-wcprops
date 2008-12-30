@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 21
+/svn/!svn/ver/2/trunk
+END
+ctypes_event.py
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/!svn/ver/2/trunk/ctypes_event.py
+END
+json.py
+K 25
+svn:wc:ra_dav:version-url
+V 29
+/svn/!svn/ver/2/trunk/json.py
+END
+ctypes_event.sh
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/!svn/ver/2/trunk/ctypes_event.sh
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/2/trunk/__init__.py
+END
+server.py
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/2/trunk/server.py
+END
+comet.py
+K 25
+svn:wc:ra_dav:version-url
+V 30
+/svn/!svn/ver/2/trunk/comet.py
+END
