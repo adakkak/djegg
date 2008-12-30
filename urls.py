@@ -11,7 +11,6 @@ urlpatterns = patterns('',
 
     (r'^time/$', current_datetime),
     (r'^plot/(\d*)$', plot),
-    (r'^remote_plot/(\d*)$', remote_plot),
     (r'^static/(?P<path>.*)', 'django.views.static.serve', {'document_root': ''}),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
